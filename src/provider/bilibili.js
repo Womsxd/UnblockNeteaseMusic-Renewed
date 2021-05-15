@@ -8,20 +8,27 @@ const format = song => {
 		id: song.id,
 		name: song.title,
 		// album: {id: song.album_id, name: song.album_title},
-		artists: {id: song.mid, name: song.author}
+		artists: {
+			id: song.mid,
+			name: song.author
+		},
+		weight: 0
 	}
 }
+
+var weight = 0
 
 const search = info => {
 	const url =
 		'https://api.bilibili.com/audio/music-service-c/s?' +
-		'search_type=music&page=1&pagesize=30&' +
+		'search_type=music&page=1&pagesize=5&' +
 		`keyword=${encodeURIComponent(info.keyword)}`
 	return request('GET', url)
 		.then(response => response.json())
 		.then(jsonBody => {
 			const list = jsonBody.data.result.map(format)
-			const matched = select(list, info)
+			const matched = select.selectList(list, info)
+			weight = matched.weight
 			return matched ? matched.id : Promise.reject()
 		})
 }
@@ -36,7 +43,10 @@ const track = id => {
 		.then(jsonBody => {
 			if (jsonBody.code === 0) {
 				// bilibili music requires referer, connect do not support referer, so change to http
-				return jsonBody.data.cdns[0].replace("https","http")
+				return {
+					url: jsonBody.data.cdns[0].replace("https", "http"),
+					weight: weight
+				}
 			} else {
 				return Promise.reject()
 			}
@@ -46,4 +56,7 @@ const track = id => {
 
 const check = info => cache(search, info).then(track)
 
-module.exports = {check, track}
+module.exports = {
+	check,
+	track
+}
