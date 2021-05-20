@@ -161,7 +161,7 @@ hook.request.after = ctx => {
 				} catch (error) {
 					netease.encrypted = true
 					netease.jsonBody = JSON.parse(patch(crypto.eapi.decrypt(buffer).toString()))
-					if (VIP && netease.path === '/batch') {
+					if (VIP && (netease.path === '/batch' || netease.path === '/api/batch')) {
 						const info = netease.jsonBody['/api/music-vip-membership/client/vip/info']
 						if (info) {
 							const expireTime = info.data.now + 31536000000

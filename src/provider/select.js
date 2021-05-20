@@ -1,30 +1,33 @@
 const similarity = require('../similarity')
 
+const replaceSpace = (string) => string.replace(/&nbsp;/g, ' ').replace(/nbsp;/g, ' ')
+
 const calcWeight = (song, info) => {
     var weight = 0
-    if (song.name) {
-        const songName = song.name.replace(/（\s*cover[:：\s][^）]+）/i, "")
-            .replace(/\(\s*cover[:：\s][^\)]+\)/i, "")
-            .replace(/（\s*翻自[:：\s][^）]+）/, "")
-            .replace(/\(\s*翻自[:：\s][^\)]+\)/, "")
-        const similarityVaule = similarity.compareTwoStrings(songName, info.name)
-        if (similarityVaule === 0) return 0 //歌曲名不相似绝对不一样    
-        if (similarityVaule === 1) weight = 0.15
-        else weight = similarityVaule / 4
-    }
+    const songName = replaceSpace(song.name.replace(/（\s*cover[:：\s][^）]+）/i, '')
+        .replace(/\(\s*cover[:：\s][^\)]+\)/i, '')
+        .replace(/（\s*翻自[:：\s][^）]+）/, '')
+        .replace(/\(\s*翻自[:：\s][^\)]+\)/, '')).toLowerCase()
+    const similarityVaule = similarity.compareTwoStrings(songName, info.name)
+    if (similarityVaule === 0) return 0 //歌曲名不相似绝对不一样    
+    if (similarityVaule === 1) weight = 0.15
+    else weight = similarityVaule / 4
+
     if (song.artists) {
         var authorName = ''
         if (Array.isArray(song.artists)) {
             song.artists.forEach(artists => {
-                authorName = authorName + artists.name
+                authorName = authorName + artists.name.replace(/&nbsp;/g, ' ')
             });
         } else {
             authorName = song.artists.name
         }
+        authorName = replaceSpace(authorName).toLowerCase()
         const songName = song.name ? song.name : ''
         info.artists.forEach(artists => {
-            if (authorName.includes(artists.name)) weight = weight + 0.1
-            else if (songName.includes(artists.name)) weight = weight + 0.1
+            const originalName=artists.name.toLowerCase()
+            if (authorName.includes(originalName)) weight = weight + 0.1
+            else if (songName.includes(originalName)) weight = weight + 0.1
             else weight = weight - 0.1
         })
     }

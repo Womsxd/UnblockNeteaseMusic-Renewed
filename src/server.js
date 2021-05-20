@@ -167,7 +167,7 @@ const proxy = {
 					.on('error', error => reject(ctx.error = error))
 					.end()
 			} else {
-				const proxySocket = net.connect(443, request.translate(url.hostname))
+				const proxySocket = net.connect(url.port || 443, request.translate(url.hostname))
 					.on('connect', () => resolve(ctx.proxySocket = proxySocket))
 					.on('error', error => reject(ctx.error = error))
 			}
