@@ -25,7 +25,7 @@ const calcWeight = (song, info) => {
         authorName = replaceSpace(authorName).toLowerCase()
         const songName = song.name ? song.name : ''
         info.artists.forEach(artists => {
-            const originalName=artists.name.toLowerCase()
+            const originalName = artists.name.toLowerCase()
             if (authorName.includes(originalName)) weight = weight + 0.1
             else if (songName.includes(originalName)) weight = weight + 0.1
             else weight = weight - 0.1

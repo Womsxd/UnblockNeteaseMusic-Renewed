@@ -5,20 +5,22 @@ const parse = query => (query || '').split('&').reduce((result, item) => (item =
 	[item[0]]: item[1]
 })), {})
 
+//const proxy = require('url').parse('http://127.0.0.1:8888')
 const proxy = undefined
 const key = process.env.YOUTUBE_KEY || null // YouTube Data API v3
 
-const format = song => (
-	song = song.videoRenderer, {
+const format = song => {
+	song = song.videoRenderer
+	return {
 		id: song.videoId,
 		name: song.title.runs[0].text,
 		duration: song.lengthText.simpleText.split(':').reduce((minute, second) => minute * 60 + parseFloat(second), 0) * 1000,
-		artists: song.ownerText.runs.map(text => ({
-			text
+		artists: song.ownerText.runs.map(data => ({
+			name: data.text
 		})),
 		weight: 0
 	}
-)
+}
 
 var weight = 0
 
@@ -74,9 +76,7 @@ const search = info => {
 }
 
 const track = id => {
-	const url =
-		`https://www.youtube.com/get_video_info?video_id=${id}&el=detailpage`
-
+	const url = `https://www.youtube.com/get_video_info?video_id=${id}&el=detailpage&html5=1`
 	return request('GET', url, {}, null, proxy)
 		.then(response => response.body())
 		.then(body => JSON.parse(parse(body).player_response).streamingData)
