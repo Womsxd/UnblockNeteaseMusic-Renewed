@@ -30,6 +30,9 @@ hook.target.host = new Set([
 	'interface3.music.163.com',
 	'apm.music.163.com',
 	'apm3.music.163.com',
+	// 'mp.music.163.com',
+	// 'api2.music.163.com',
+	// 'st.music.163.com',
 	// 'mam.netease.com',
 	// 'api.iplay.163.com', // look living
 	// 'ac.dun.163yun.com',
@@ -161,24 +164,24 @@ hook.request.after = ctx => {
 				} catch (error) {
 					netease.encrypted = true
 					netease.jsonBody = JSON.parse(patch(crypto.eapi.decrypt(buffer).toString()))
-					if (VIP && (netease.path === '/batch' || netease.path === '/api/batch')) {
-						const info = netease.jsonBody['/api/music-vip-membership/client/vip/info']
-						if (info) {
-							const expireTime = info.data.now + 31536000000
-							info.data.redVipLevel = 7
-							info.data.redVipAnnualCount = 1
+					if (VIP) {
+						if (netease.path === '/batch' || netease.path === '/api/batch') {
+							var info = netease.jsonBody['/api/music-vip-membership/client/vip/info']
+							if (info) {
+								const expireTime = info.data.now + 31622400000
+								info.data.redVipLevel = 7
+								info.data.redVipAnnualCount = 1
 
-							info.data.musicPackage.expireTime = expireTime
-							info.data.musicPackage.vipCode = 1
+								info.data.musicPackage.expireTime = expireTime
+								info.data.musicPackage.vipCode = 230
 
-							info.data.associator.expireTime = expireTime
-							info.data.associator.vipCode = 1
+								info.data.associator.expireTime = expireTime
 
-							netease.jsonBody['/api/music-vip-membership/client/vip/info'] = info
+								netease.jsonBody['/api/music-vip-membership/client/vip/info'] = info
+							}
 						}
 					}
 				}
-
 				if (new Set([401, 512]).has(netease.jsonBody.code) && !netease.web) {
 					if (netease.path.includes('manipulate')) return tryCollect(ctx)
 					else if (netease.path == '/api/song/like') return tryLike(ctx)
