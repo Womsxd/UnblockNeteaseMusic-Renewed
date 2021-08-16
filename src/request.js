@@ -23,6 +23,11 @@ const configure = (method, url, headers, proxy) => {
 		options.headers = headers
 	}
 
+	// 忽略pyncmd的SSL校验 缓解证书不被信任的问题
+	if (url.hostname === 'mos9527.tooo.top' && (process.env.OFF_EASE_PYNCMD || '').toLowerCase() != 'true') {
+		options.rejectUnauthorized = false;
+	}
+
 	if (proxy) {
 		options.hostname = translate(proxy.hostname)
 		options.port = proxy.port || ((proxy.protocol === 'https:') ? 443 : 80)
